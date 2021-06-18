@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -35,17 +34,14 @@ func init() {
 }
 
 func main() {
-	// TODO Basic Bot to play Menace
-	log.Info("Starting up")
+	log.Info("Starting up...")
 	// Create a new Discord session using the provided bot token.
 	if Token == "" {
-		log.Error("Token Required for bot usage")
-		os.Exit(1)
+		log.Fatalln("ERROR: Token Required for bot usage")
 	}
 	dg, err := discordgo.New("Bot " + Token)
 	if err != nil {
-		fmt.Println("error creating Discord session,", err)
-		return
+		log.Fatalf("Error creating Discord session: %v\n", err)
 	}
 
 	Router = router.NewCommandRouter()
@@ -58,9 +54,11 @@ func main() {
 	// Open a websocket connection to Discord and begin listening.
 	err = dg.Open()
 	if err != nil {
-		fmt.Println("error opening connection,", err)
-		return
+		log.Fatalf("Error opening connection: %v\n", err)
 	}
+
+	// Cleanly close down the Discord session at end of exectution.
+	defer dg.Close()
 
 	// Load Menace Commands
 	menace.Setup(Router)
@@ -68,9 +66,6 @@ func main() {
 	// Wait here until CTRL-C or other term signal is received.
 	log.Info("Bot is now running")
 	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
-
-	// Cleanly close down the Discord session.
-	dg.Close()
 }
