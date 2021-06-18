@@ -22,22 +22,23 @@ func NewBoard(a, b, c, d, e, f, h, i, j State) Board {
 }
 
 func BoardMatch(a, b Board) bool {
-	if a.Layout[1][1] == b.Layout[1][1] {
-		var aFlat = BoardFlatten(a)
-		var bFlat = BoardFlatten(b)
+	if a.Layout[1][1] != b.Layout[1][1] {
+		return false
+	}
+	var aFlat = BoardFlatten(a)
+	var bFlat = BoardFlatten(b)
 
-		for rot := 0; rot < 7; rot++ {
-			if rot == 4 {
-				aFlat = BoardRevers(aFlat)
+	for rot := 0; rot < 7; rot++ {
+		if rot == 4 {
+			aFlat = BoardRevers(aFlat)
+		}
+		aFlat = BoardRotate(aFlat)
+		for i := 0; i < 8; i++ {
+			if aFlat[i%8] != bFlat[i%8] {
+				break
 			}
-			aFlat = BoardRotate(aFlat)
-			for i := 0; i < 8; i++ {
-				if aFlat[i%8] != bFlat[i%8] {
-					break
-				}
-				if i == 7 {
-					return true
-				}
+			if i == 7 {
+				return true
 			}
 		}
 	}
