@@ -10,6 +10,7 @@ const (
 	X State = 1 - iota
 	EMPTY
 	O
+	MOVE
 )
 
 func NewBoard(a, b, c, d, e, f, h, i, j State) Board {
@@ -27,15 +28,20 @@ func BoardMatch(a, b Board) bool {
 		var aFlat = BoardFlatten(a)
 		var bFlat = BoardFlatten(b)
 
-		for rot := 0; rot < 8 && matches != 8; rot += 2 {
+		for rot := 0; rot < 4 && matches != 8; rot++ {
 			matches = 0
-			for i := 0; i < 16; i++ {
+			aFlat = BoardRotate(aFlat)
+			for i := 0; i < 16 && matches != 8; i++ {
 				if i == 8 {
 					aFlat = BoardRevers(aFlat)
+					matches = 0
 				}
-				if aFlat[(i+rot)%8] == bFlat[i%8] {
+				if aFlat[i%8] == bFlat[i%8] {
 					matches++
 				}
+			}
+			if matches != 8 {
+				aFlat = BoardRevers(aFlat)
 			}
 		}
 	}
@@ -49,5 +55,9 @@ func BoardFlatten(b Board) [8]State {
 	}
 }
 func BoardRevers(b [8]State) [8]State {
-	return [8]State{b[7], b[6], b[5], b[4], b[3], b[2], b[1], b[0]}
+	return [8]State{b[0], b[7], b[6], b[5], b[4], b[3], b[2], b[1]}
+}
+
+func BoardRotate(b [8]State) [8]State {
+	return [8]State{b[2], b[3], b[4], b[5], b[6], b[7], b[0], b[1]}
 }
