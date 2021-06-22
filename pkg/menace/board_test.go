@@ -1,6 +1,10 @@
-package menace
+package menace_test
 
-import "testing"
+import (
+	"testing"
+
+	. "github.com/Plloi/pdb-menace/pkg/menace"
+)
 
 func Test_BoardMatch(t *testing.T) {
 	t.Run("Matching Boards", func(t *testing.T) {
